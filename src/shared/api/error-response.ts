@@ -1,12 +1,10 @@
-import type { ApiErrorResponse, StopItemPayload } from "@/types/menu";
-
 export function errorResponse(
   status: number,
   code: string,
   message: string,
-  fieldErrors?: Partial<Record<keyof StopItemPayload, string[]>>,
+  fieldErrors?: Record<string, string[]>,
 ): Response {
-  const body: ApiErrorResponse = {
+  const body = {
     error: {
       code,
       message,
