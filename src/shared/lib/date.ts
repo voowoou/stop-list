@@ -4,3 +4,17 @@ export function localDateTimeToIso(value: string): string {
   // Пустое или некорректное поле должно пройти через ошибку схемы, а не стать null.
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
 }
+
+const stopTimeFormatter = new Intl.DateTimeFormat("ru-RU", {
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+export function formatStopUntil(value: string | null): string {
+  if (value === null) return "До конца смены";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Срок не указан";
+
+  return `До ${stopTimeFormatter.format(date)}`;
+}

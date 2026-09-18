@@ -24,7 +24,7 @@ export function Header() {
         isCompact ? "h-10 shadow-sm" : "h-12.5"
       }`}
     >
-      <div className="mx-auto flex h-full w-full max-w-7xl items-center gap-3 px-8">
+      <div className="flex h-full w-full items-center gap-3 px-8">
         <h1
           className={`font-display font-bold leading-none transition-[font-size] duration-200 motion-reduce:transition-none ${
             isCompact ? "text-base" : "text-xl"
