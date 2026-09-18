@@ -3,6 +3,8 @@
 import { useIsMenuItemSaving } from "@/features/stop-list/model/use-is-menu-item-saving";
 import { formatStopUntil } from "@/shared/lib/date";
 import { Badge } from "@/shared/ui/Badge";
+import { Button } from "@/shared/ui/Button";
+import { Spinner } from "@/shared/ui/Spinner";
 import {
   type MenuItem,
   menuItemStatusLabels,
@@ -24,18 +26,18 @@ export function StopListTable({
   onStop,
 }: StopListTableProps) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-6xl table-fixed border-collapse text-left">
+    <div className="table-scrollbar overflow-x-auto">
+      <table className="w-full min-w-[75rem] table-fixed border-collapse text-left">
         <caption className="sr-only">
           Меню смены и управление стоп-листом
         </caption>
         <colgroup>
-          <col className="w-1/4" />
-          <col className="w-1/12" />
-          <col className="w-1/12" />
-          <col className="w-1/8" />
-          <col className="w-7/24" />
-          <col className="w-1/6" />
+          <col className="w-[22%]" />
+          <col className="w-28" />
+          <col className="w-28" />
+          <col className="w-40" />
+          <col className="w-[30%]" />
+          <col className="w-60" />
         </colgroup>
         <thead>
           <tr className="border-b-2 border-muted text-base font-medium text-secondary">
@@ -73,7 +75,7 @@ function StopListRow({ item, onEdit, onResume, onStop }: StopListRowProps) {
   const isSaving = useIsMenuItemSaving(item.id);
   const stoppedStatus = item.status.kind === "stopped" ? item.status : null;
   const isStopped = stoppedStatus !== null;
-  const resumeDisabled = isSaving || item.stock === 0 || !onResume;
+  const resumeDisabled = item.stock === 0 || !onResume;
 
   return (
     <tr
@@ -85,12 +87,7 @@ function StopListRow({ item, onEdit, onResume, onStop }: StopListRowProps) {
         scope="row"
         className="align-top px-4 py-5 font-sans font-medium text-foreground"
       >
-        <span className="block max-w-64">{item.title}</span>
-        {isSaving && (
-          <output className="mt-1 block text-xs font-medium text-accent">
-            Сохраняется…
-          </output>
-        )}
+        <span className="block">{item.title}</span>
       </th>
       <td className="align-top px-4 py-5">{shopLabels[item.shop]}</td>
       <td className="align-top px-4 py-5 text-right tabular-nums">
@@ -118,7 +115,17 @@ function StopListRow({ item, onEdit, onResume, onStop }: StopListRowProps) {
       </td>
       <td className="align-top px-4 py-5">
         <div className="flex justify-end gap-2">
-          {isStopped ? (
+          {isSaving ? (
+            <Button
+              aria-label={`Сохраняется изменение позиции «${item.title}»`}
+              className="min-w-36 gap-2 px-3"
+              disabled
+              variant="outline"
+            >
+              <Spinner />
+              Сохраняем…
+            </Button>
+          ) : isStopped ? (
             <>
               <ActionButton
                 disabled={isSaving || !onEdit}
@@ -169,18 +176,14 @@ function ActionButton({
   title,
 }: ActionButtonProps) {
   return (
-    <button
-      type="button"
-      className={`h-8 min-w-24 cursor-pointer whitespace-nowrap border-2 px-3 font-display text-sm font-medium leading-none uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${
-        accent
-          ? "border-accent bg-accent text-white hover:bg-accent/90"
-          : "border-foreground text-foreground hover:bg-foreground/10"
-      }`}
+    <Button
+      className="min-w-24 px-3"
       disabled={disabled}
       onClick={onClick}
       title={title}
+      variant={accent ? "accent" : "outline"}
     >
       {children}
-    </button>
+    </Button>
   );
 }

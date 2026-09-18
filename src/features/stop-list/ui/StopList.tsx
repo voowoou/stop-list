@@ -2,9 +2,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ToastViewport } from "@/shared/ui/ToastViewport";
 import type { MenuFilters } from "@/types/menu";
 import { createMenuFiltersHref, readMenuFilters } from "../model/filters";
 import { menuListOptions } from "../model/queries";
+import { useStopListUi } from "../model/use-stop-list-ui";
 import { Filters } from "./Filters";
 import {
   MenuListEmpty,
@@ -12,6 +14,7 @@ import {
   MenuListLoading,
 } from "./MenuListStates";
 import { StopListTable } from "./StopListTable";
+import { StopReasonPanel } from "./StopReasonPanel";
 
 interface StopListProps {
   initialFilters: MenuFilters;
@@ -25,6 +28,10 @@ export function StopList({ initialFilters }: StopListProps) {
   const filters = searchParams.size === 0 ? initialFilters : urlFilters;
   const menuQuery = useQuery(menuListOptions(filters));
   const hasActiveFilters = filters.shop !== null || filters.status !== null;
+  const selectedItemId = useStopListUi((state) => state.selectedItemId);
+  const openPanel = useStopListUi((state) => state.openPanel);
+  const selectedItem =
+    menuQuery.data?.find((item) => item.id === selectedItemId) ?? null;
 
   function resetFilters() {
     router.push(
@@ -55,8 +62,15 @@ export function StopList({ initialFilters }: StopListProps) {
           onResetFilters={resetFilters}
         />
       ) : (
-        <StopListTable items={menuQuery.data} />
+        <StopListTable
+          items={menuQuery.data}
+          onEdit={(item) => openPanel(item.id, "edit")}
+          onStop={(item) => openPanel(item.id, "create")}
+        />
       )}
+
+      <StopReasonPanel item={selectedItem} />
+      <ToastViewport />
     </div>
   );
 }

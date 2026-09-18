@@ -29,3 +29,63 @@ body {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+.table-scrollbar {
+  scrollbar-color: var(--secondary)
+    color-mix(in srgb, var(--muted) 45%, transparent);
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+}
+
+.table-scrollbar::-webkit-scrollbar {
+  height: 10px;
+}
+
+.table-scrollbar::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--muted) 45%, transparent);
+}
+
+.table-scrollbar::-webkit-scrollbar-thumb {
+  border: 2px solid var(--background);
+  background: var(--secondary);
+}
+
+.table-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawer-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}

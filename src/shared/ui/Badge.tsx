@@ -21,7 +21,7 @@ export function Badge({
 }: BadgeProps) {
   return (
     <span
-      className={`flex min-h-7 w-full items-center justify-center rounded-full px-4 py-1 font-sans text-sm font-medium leading-none uppercase ${toneClassNames[tone]} ${className}`}
+      className={`flex min-h-7 w-full items-center justify-center whitespace-nowrap rounded-full px-4 py-1 font-sans text-sm font-medium leading-none uppercase ${toneClassNames[tone]} ${className}`}
       {...props}
     >
       {children}
