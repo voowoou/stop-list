@@ -14,8 +14,8 @@ export function ToastViewport() {
 
   return (
     <div
-      aria-atomic="false"
       aria-live="polite"
+      aria-relevant="additions text"
       className="pointer-events-none fixed right-6 bottom-6 z-60 flex w-[min(24rem,calc(100vw-3rem))] flex-col gap-3"
     >
       {toasts.map((toast) => (
@@ -37,7 +37,10 @@ function Toast({ toast }: { toast: ToastMessage }) {
   }, [removeToast, toast.id]);
 
   return (
-    <div className="pointer-events-auto flex items-start gap-4 border-2 border-accent bg-accent px-4 py-3 text-sm text-white shadow-xl">
+    <div
+      aria-atomic="true"
+      className="pointer-events-auto flex items-start gap-4 border-2 border-accent bg-accent px-4 py-3 text-sm text-white shadow-xl"
+    >
       <p className="min-w-0 flex-1">{toast.message}</p>
       <button
         type="button"

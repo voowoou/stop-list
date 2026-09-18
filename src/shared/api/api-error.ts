@@ -18,3 +18,10 @@ export class ApiError extends Error {
     this.fieldErrors = fieldErrors;
   }
 }
+
+export function getApiErrorMessage(
+  error: unknown,
+  fallbackMessage: string,
+): string {
+  return error instanceof ApiError ? error.message : fallbackMessage;
+}

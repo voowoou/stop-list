@@ -20,8 +20,8 @@ export function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b-2 border-black/10 bg-background/95 backdrop-blur-sm transition-[height,box-shadow] duration-200 motion-reduce:transition-none ${
-        isCompact ? "h-10 shadow-sm" : "h-12.5"
+      className={`sticky top-0 z-40 border-b-2 border-black/10 bg-background/95 backdrop-blur-sm transition-[height] duration-200 motion-reduce:transition-none ${
+        isCompact ? "h-10" : "h-12.5"
       }`}
     >
       <div className="flex h-full w-full items-center gap-3 px-8">

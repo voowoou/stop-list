@@ -3,6 +3,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { useEffect, useState } from "react";
 import { Controller } from "react-hook-form";
+import { getApiErrorMessage } from "@/shared/api/api-error";
 import {
   getNextQuarterHour,
   isoToLocalDateTime,
@@ -62,9 +63,10 @@ export function StopReasonPanel({ item }: StopReasonPanelProps) {
       {
         onError: (error) =>
           addToast(
-            error instanceof Error
-              ? error.message
-              : "Не удалось сохранить изменения. Попробуйте ещё раз",
+            getApiErrorMessage(
+              error,
+              "Не удалось сохранить изменения. Попробуйте ещё раз",
+            ),
           ),
       },
     );

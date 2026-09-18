@@ -54,6 +54,14 @@ body {
   background: var(--foreground);
 }
 
+.table-scroll-content {
+  scrollbar-width: none;
+}
+
+.table-scroll-content::-webkit-scrollbar {
+  display: none;
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
