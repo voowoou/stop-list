@@ -1,37 +1,20 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FilterTab } from "@/shared/ui/FilterTab";
 import type { MenuFilters } from "@/types/menu";
-import { createMenuFiltersHref, readMenuFilters } from "../model/filters";
 
 interface FiltersProps {
-  initialFilters: ReturnType<typeof readMenuFilters>;
+  filters: MenuFilters;
+  onChange: (filters: MenuFilters) => void;
 }
 
-export function Filters({ initialFilters }: FiltersProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const urlFilters = readMenuFilters(searchParams);
-  const filters = searchParams.size === 0 ? initialFilters : urlFilters;
-
-  function navigate(nextFilters: typeof filters) {
-    const href = createMenuFiltersHref(
-      pathname,
-      new URLSearchParams(searchParams.toString()),
-      nextFilters,
-    );
-
-    router.push(href, { scroll: false });
-  }
-
+export function Filters({ filters, onChange }: FiltersProps) {
   function selectShop(shop: MenuFilters["shop"]) {
-    navigate({ ...filters, shop });
+    onChange({ ...filters, shop });
   }
 
   function selectStatus(status: MenuFilters["status"]) {
-    navigate({ ...filters, status });
+    onChange({ ...filters, status });
   }
 
   return (

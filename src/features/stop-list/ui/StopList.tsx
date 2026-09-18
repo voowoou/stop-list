@@ -1,7 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { getApiErrorMessage } from "@/shared/api/api-error";
 import { ToastViewport } from "@/shared/ui/ToastViewport";
 import type { MenuFilters } from "@/types/menu";
@@ -23,11 +24,9 @@ interface StopListProps {
 }
 
 export function StopList({ initialFilters }: StopListProps) {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const urlFilters = readMenuFilters(searchParams);
-  const filters = searchParams.size === 0 ? initialFilters : urlFilters;
+  const [filters, setFilters] = useState(initialFilters);
   const menuQuery = useQuery(menuListOptions(filters));
   const resumeMutation = useResumeItem();
   const hasActiveFilters = filters.shop !== null || filters.status !== null;
@@ -37,15 +36,23 @@ export function StopList({ initialFilters }: StopListProps) {
   const selectedItem =
     menuQuery.data?.find((item) => item.id === selectedItemId) ?? null;
 
-  function resetFilters() {
-    router.push(
-      createMenuFiltersHref(
-        pathname,
-        new URLSearchParams(searchParams.toString()),
-        { shop: null, status: null },
-      ),
-      { scroll: false },
+  useEffect(() => {
+    setFilters(readMenuFilters(searchParams));
+  }, [searchParams]);
+
+  function navigate(nextFilters: MenuFilters) {
+    const href = createMenuFiltersHref(
+      pathname,
+      new URLSearchParams(searchParams.toString()),
+      nextFilters,
     );
+
+    setFilters(nextFilters);
+    window.history.pushState(null, "", href);
+  }
+
+  function resetFilters() {
+    navigate({ shop: null, status: null });
   }
 
   function resumeItem(id: string) {
@@ -65,7 +72,7 @@ export function StopList({ initialFilters }: StopListProps) {
 
   return (
     <div className="flex flex-col gap-8">
-      <Filters initialFilters={initialFilters} />
+      <Filters filters={filters} onChange={navigate} />
 
       {menuQuery.isPending ? (
         <MenuListLoading />
