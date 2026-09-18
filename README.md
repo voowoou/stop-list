@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Стоп-лист меню
 
-## Getting Started
+Панель управления стоп-листом для заведения по ТЗ. Пользователь может отфильтровать меню по цеху и статусу, временно остановить продажу позиции из меню, а также изменить причину и срок остановки или вернуть позицию в продажу.
 
-First, run the development server:
+## Запуск
+
+Требуется Node.js 20 или новее.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+После запуска приложение доступно по адресу [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Проверки перед сборкой:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-## Learn More
+## Стек
 
-To learn more about Next.js, take a look at the following resources:
+- Next.js, React, TypeScript
+- TanStack Query, Zustand
+- React Hook Form и Zod
+- Radix Dialog -- добавлено для реализации выдвигающейся панели
+- Tailwind CSS
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Структура
+Взята ориентировочная структура из ТЗ — упрощённая версия FSD:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```text
+src/
+  app/                         страницы, layout и route handlers
+  features/stop-list/
+    api/                       запросы к моковому API
+    model/                     query ключи, мутации, формы и UI-store
+    ui/                        фильтры, таблица и панель стопа
+  server/                      in-memory хранилище и сиды
+  shared/                      общие API-функции и UI-компоненты
+  types/                       доменные типы
+  widgets/                     сюда добавлен простой хэдер
+```
 
-## Deploy on Vercel
+## Серверные компоненты vs клиентские
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`app/page.tsx` сделана серверным компонентом, который читает `searchParams`, нормализует фильтры и передаёт их интерактивному экрану.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Таблица, фильтры, форма и Query Provider — клиентские компоненты, потому что используют события, браузерную навигацию и хуки. Route handlers и `server/menu-store.ts` выполняются только на сервере.
+
+## Архитектурные решения
+
+Серверные данные хранятся только в TanStack Query, а Zustand отвечает за открытую панель, выбранную позицию и очередь тостов. Фильтры записываются в URL, поэтому сохраняются после перезагрузки и работают с кнопками «назад» и «вперёд». Мутации оптимистично обновляют списки, учитывают их фильтры и восстанавливают предыдущую позицию при ошибке. UI-компоненты не работают с `fetch` напрямую: query keys и мутации вынесены в отдельные слои.
+
+## Валидация и обработка ошибок
+
+Есть Zod-схема, которая используется в React Hook Form и в route handler постановки в стоп. Она проверяет обязательную причину, будущее время, ограничение в 24 часа и шаг 15 минут. Значение `null` означает остановку продажи до конца смены, а конкретное локальное время преобразуется в ISO перед отправкой.
+
+Сервер отвечает на мутации с задержкой 600 мс и примерно в 20% случаев возвращает ошибку. Статус строки меняется сразу; пока запрос выполняется, действие помечается как сохраняемое. При ошибке TanStack Query откатывает изменённую позицию, а в углу экрана появляется тост.
+
+Позицию с нулевым остатком нельзя вернуть в продажу.
+
+## Ограничения
+
+Данные хранятся в памяти процесса и сбрасываются после перезапуска локального сервера. На Vercel serverless-инстансы могут перезапускаться или обрабатывать запросы независимо, поэтому изменения не гарантированно сохраняются между запросами. Для тестового задания это ожидаемое поведение.
+
+## Что можно улучшить
+
+- добавить тест на оптимистическое обновление и откат
+- в целом покрыть тестами и потестировать в разных браузерах (тем же browser stack'ом, поскольку я смотрел на работу только в Chrome и в Firefox)
+- допилить ui сетку и микроинтерактивностей для улучшения аффорденса (я собирал простой макет в фигме чтобы не тратить много времени на проработку ui)
+- заменить in-memory store постоянным хранилищем
+- добавить наблюдаемость ошибок и повтор запросов с учётом типа ошибки
